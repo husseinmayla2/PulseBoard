@@ -1,7 +1,11 @@
-export default function App() {
+import { Dashboard } from './components/dashboard/Dashboard';
+
+function App() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="text-blue-500 text-3xl font-bold">Hello PulseBoard</div>
+    <div className="min-h-screen bg-slate-900">
+      <Dashboard />
     </div>
-  )
+  );
 }
+
+export default App;
