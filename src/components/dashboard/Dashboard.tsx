@@ -1,4 +1,4 @@
-import { mockProjects, mockActivities, tasks } from '@/lib/mockData';
+import { mockProjects, mockActivities, tasks } from '../../lib/mockData';
 import { Card } from '../ui/Card';
 
 export const Dashboard = () => {
