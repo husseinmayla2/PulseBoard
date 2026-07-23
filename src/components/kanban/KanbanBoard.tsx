@@ -3,7 +3,7 @@ import { DndContext, closestCenter } from '@dnd-kit/core';
 import { useSortable, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useDroppable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { tasks as initialTasks, Task } from '@/lib/mockData';
+import { tasks as initialTasks, Task } from '../../lib/mockData';
 
 const Column = ({ title, status, tasks }: { title: string; status: Task['status']; tasks: Task[] }) => {
   const { setNodeRef, isOver } = useDroppable({
