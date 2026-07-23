@@ -1,3 +1,11 @@
+export interface Task {
+  id: string;
+  title: string;
+  status: 'todo' | 'in-progress' | 'done';
+  priority: 'low' | 'medium' | 'high';
+  deadline: string;
+}
+
 export interface Project {
   id: string;
   name: string;
@@ -12,6 +20,12 @@ export interface Activity {
   description: string;
   timestamp: string;
 }
+
+export const tasks: Task[] = [
+  { id: '1', title: 'Design System', status: 'todo', priority: 'high', deadline: '2026-08-01' },
+  { id: '2', title: 'API Integration', status: 'in-progress', priority: 'medium', deadline: '2026-08-05' },
+  { id: '3', title: 'Dashboard UI', status: 'done', priority: 'low', deadline: '2026-07-25' },
+];
 
 export const mockProjects: Project[] = [
   { id: '1', name: 'Website Redesign', status: 'active', progress: 75, team: ['Alice', 'Bob'], deadline: '2026-08-15' },
