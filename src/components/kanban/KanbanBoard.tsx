@@ -107,13 +107,13 @@ export const KanbanBoard = () => {
         onDragEnd={handleDragEnd}
     >
       <div className="flex gap-4 mb-6 p-4 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-lg">
-        <select value={filter} onChange={(e) => setFilter(e.target.value as any)} className="bg-neutral-900 text-white p-2 rounded-lg border border-white/10">
+        <select value={filter} onChange={(e) => setFilter(e.target.value as any)} className="bg-neutral-800 text-white p-2 rounded-lg border border-white/20 focus:ring-2 focus:ring-indigo-500 outline-none">
           <option value="all">All Priorities</option>
           <option value="low">Low Priority</option>
           <option value="medium">Medium Priority</option>
           <option value="high">High Priority</option>
         </select>
-        <select value={sort} onChange={(e) => setSort(e.target.value as any)} className="bg-neutral-900 text-white p-2 rounded-lg border border-white/10">
+        <select value={sort} onChange={(e) => setSort(e.target.value as any)} className="bg-neutral-800 text-white p-2 rounded-lg border border-white/20 focus:ring-2 focus:ring-indigo-500 outline-none">
           <option value="none">Sort by Deadline</option>
           <option value="deadline-asc">Earliest Deadline</option>
           <option value="deadline-desc">Latest Deadline</option>
