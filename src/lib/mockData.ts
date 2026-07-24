@@ -1,5 +1,6 @@
 export interface Task {
   id: string;
+  projectId: string;
   title: string;
   status: 'todo' | 'in-progress' | 'done';
   priority: 'low' | 'medium' | 'high';
@@ -22,9 +23,9 @@ export interface Activity {
 }
 
 export const tasks: Task[] = [
-  { id: '1', title: 'Design System', status: 'todo', priority: 'high', deadline: '2026-08-01' },
-  { id: '2', title: 'API Integration', status: 'in-progress', priority: 'medium', deadline: '2026-08-05' },
-  { id: '3', title: 'Dashboard UI', status: 'done', priority: 'low', deadline: '2026-07-25' },
+  { id: '1', projectId: '1', title: 'Design System', status: 'todo', priority: 'high', deadline: '2026-08-01' },
+  { id: '2', projectId: '2', title: 'API Integration', status: 'in-progress', priority: 'medium', deadline: '2026-08-05' },
+  { id: '3', projectId: '1', title: 'Dashboard UI', status: 'done', priority: 'low', deadline: '2026-07-25' },
 ];
 
 export const mockProjects: Project[] = [
