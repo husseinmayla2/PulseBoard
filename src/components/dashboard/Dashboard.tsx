@@ -1,10 +1,14 @@
-import { mockProjects, mockActivities, tasks } from '../../lib/mockData';
 import { Card } from '../ui/Card';
+import { useData } from '../../lib/DataContext';
 
 export const Dashboard = () => {
-  const activeProjects = mockProjects.filter((p) => p.status === 'active').length;
+  const { projects, tasks } = useData();
+  
+  const activeProjects = projects.filter((p) => p.status === 'active').length;
   const totalProgress = Math.round(
-    mockProjects.reduce((acc, curr) => acc + curr.progress, 0) / mockProjects.length
+    projects.length > 0 
+      ? projects.reduce((acc, curr) => acc + curr.progress, 0) / projects.length 
+      : 0
   );
   const totalTasks = tasks.length;
 
@@ -33,7 +37,7 @@ export const Dashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {mockProjects.map((project) => (
+          {projects.map((project) => (
             <Card key={project.id} className="group hover:border-white/20 transition-all duration-300">
               <h2 className="text-lg font-semibold text-white/90">{project.name}</h2>
               <p className="text-white/50 text-sm mt-1 capitalize">{project.status}</p>
@@ -50,12 +54,8 @@ export const Dashboard = () => {
         <Card>
           <h2 className="text-xl font-semibold text-white/90 mb-6">Recent Activity</h2>
           <ul className="space-y-6">
-            {mockActivities.map((activity) => (
-              <li key={activity.id} className="group border-l border-white/10 pl-4 py-1 hover:border-sky-500/50 transition-colors">
-                <p className="text-sm text-white/80">{activity.description}</p>
-                <span className="text-xs text-white/40 mt-1 block">{activity.timestamp}</span>
-              </li>
-            ))}
+            {/* Activities could also be fetched from useData() */}
+            <li className="text-sm text-white/40">No recent activity.</li>
           </ul>
         </Card>
       </div>
