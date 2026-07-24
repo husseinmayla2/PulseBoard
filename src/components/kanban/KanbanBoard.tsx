@@ -4,8 +4,9 @@ import { useSortable, SortableContext, verticalListSortingStrategy, arrayMove } 
 import { useDroppable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import { tasks as initialTasks, Task } from '../../lib/mockData';
+import { TaskDetailPanel } from './TaskDetailPanel';
 
-const Column = ({ title, status, tasks }: { title: string; status: Task['status']; tasks: Task[] }) => {
+const Column = ({ title, status, tasks, onTaskClick }: { title: string; status: Task['status']; tasks: Task[], onTaskClick: (t: Task) => void }) => {
   const { setNodeRef, isOver } = useDroppable({
     id: status,
   });
@@ -19,7 +20,7 @@ const Column = ({ title, status, tasks }: { title: string; status: Task['status'
       <div className="flex flex-col gap-3 min-h-[100px]">
         <SortableContext items={tasks.filter(t => t.status === status).map(t => t.id)} strategy={verticalListSortingStrategy}>
           {tasks.filter(t => t.status === status).map(task => (
-            <TaskCard key={task.id} task={task} />
+            <TaskCard key={task.id} task={task} onClick={() => onTaskClick(task)} />
           ))}
         </SortableContext>
       </div>
@@ -27,7 +28,7 @@ const Column = ({ title, status, tasks }: { title: string; status: Task['status'
   );
 };
 
-const TaskCard = ({ task, isOverlay }: { task: Task; isOverlay?: boolean }) => {
+const TaskCard = ({ task, isOverlay, onClick }: { task: Task; isOverlay?: boolean; onClick?: () => void }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task.id });
   const style = { 
     transform: CSS.Translate.toString(transform),
@@ -41,6 +42,7 @@ const TaskCard = ({ task, isOverlay }: { task: Task; isOverlay?: boolean }) => {
       style={style}
       {...attributes}
       {...listeners}
+      onClick={onClick}
       className={`bg-white/5 backdrop-blur-xl border border-white/10 p-4 rounded-xl text-white shadow-lg cursor-grab active:cursor-grabbing touch-none hover:bg-white/10 transition-all ${isOverlay ? 'rotate-2 cursor-grabbing shadow-2xl' : ''}`}
     >
       <p className="font-semibold text-white/90">{task.title}</p>
@@ -52,6 +54,7 @@ const TaskCard = ({ task, isOverlay }: { task: Task; isOverlay?: boolean }) => {
 export const KanbanBoard = () => {
   const [tasks, setTasks] = useState(initialTasks);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   const sensors = useSensors(useSensor(PointerSensor));
 
@@ -69,9 +72,6 @@ export const KanbanBoard = () => {
     const activeId = active.id;
     const overId = over.id;
 
-    const activeTaskIndex = tasks.findIndex(t => t.id === activeId);
-    
-    // Check if dropped in a different status
     if (['todo', 'in-progress', 'done'].includes(overId)) {
         setTasks(tasks => tasks.map(task => {
             if (task.id === activeId) {
@@ -80,7 +80,7 @@ export const KanbanBoard = () => {
             return task;
         }));
     } else {
-        // Reordering logic
+        const activeTaskIndex = tasks.findIndex(t => t.id === activeId);
         const overTaskIndex = tasks.findIndex(t => t.id === overId);
         if (activeTaskIndex !== overTaskIndex) {
             setTasks((items) => arrayMove(items, activeTaskIndex, overTaskIndex));
@@ -96,13 +96,23 @@ export const KanbanBoard = () => {
         onDragEnd={handleDragEnd}
     >
       <div className="flex gap-8 p-4">
-        <Column title="To Do" status="todo" tasks={tasks} />
-        <Column title="In Progress" status="in-progress" tasks={tasks} />
-        <Column title="Done" status="done" tasks={tasks} />
+        <Column title="To Do" status="todo" tasks={tasks} onTaskClick={setSelectedTask} />
+        <Column title="In Progress" status="in-progress" tasks={tasks} onTaskClick={setSelectedTask} />
+        <Column title="Done" status="done" tasks={tasks} onTaskClick={setSelectedTask} />
       </div>
       <DragOverlay>
         {activeTask ? <TaskCard task={activeTask} isOverlay /> : null}
       </DragOverlay>
+      {selectedTask && (
+        <TaskDetailPanel 
+          task={selectedTask} 
+          onClose={() => setSelectedTask(null)} 
+          onUpdate={(updatedTask) => {
+            setTasks(tasks.map(t => t.id === updatedTask.id ? updatedTask : t));
+            setSelectedTask(updatedTask);
+          }}
+        />
+      )}
     </DndContext>
   );
 };
