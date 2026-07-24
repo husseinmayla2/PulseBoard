@@ -13,10 +13,10 @@ const Column = ({ title, status, tasks }: { title: string; status: Task['status'
   return (
     <div 
       ref={setNodeRef} 
-      className={`bg-white/5 backdrop-blur-xl border border-white/10 p-4 rounded-xl flex flex-col gap-4 w-80 transition-all ${isOver ? 'bg-white/10 border-indigo-500/50' : ''}`}
+      className={`bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-2xl flex flex-col gap-4 w-80 transition-all ${isOver ? 'bg-white/10 border-indigo-500/50' : ''}`}
     >
-      <h2 className="text-white font-bold text-lg px-2">{title}</h2>
-      <div className="flex flex-col gap-2 min-h-[100px]">
+      <h2 className="text-white/90 font-bold text-lg px-2 tracking-tight">{title}</h2>
+      <div className="flex flex-col gap-3 min-h-[100px]">
         <SortableContext items={tasks.filter(t => t.status === status).map(t => t.id)} strategy={verticalListSortingStrategy}>
           {tasks.filter(t => t.status === status).map(task => (
             <TaskCard key={task.id} task={task} />
@@ -41,10 +41,10 @@ const TaskCard = ({ task, isOverlay }: { task: Task; isOverlay?: boolean }) => {
       style={style}
       {...attributes}
       {...listeners}
-      className={`bg-white/10 p-4 rounded-lg text-white shadow-lg border border-white/5 cursor-grab active:cursor-grabbing touch-none hover:bg-white/20 transition-colors ${isOverlay ? 'rotate-2 cursor-grabbing shadow-2xl' : ''}`}
+      className={`bg-white/5 backdrop-blur-xl border border-white/10 p-4 rounded-xl text-white shadow-lg cursor-grab active:cursor-grabbing touch-none hover:bg-white/10 transition-all ${isOverlay ? 'rotate-2 cursor-grabbing shadow-2xl' : ''}`}
     >
-      <p className="font-semibold">{task.title}</p>
-      <div className="text-xs text-white/50 mt-2">{task.priority.toUpperCase()} | {task.deadline}</div>
+      <p className="font-semibold text-white/90">{task.title}</p>
+      <div className="text-xs text-white/50 mt-2 font-medium">{task.priority.toUpperCase()} | {task.deadline}</div>
     </div>
   );
 };
@@ -95,7 +95,7 @@ export const KanbanBoard = () => {
         onDragStart={handleDragStart} 
         onDragEnd={handleDragEnd}
     >
-      <div className="flex gap-6 p-6">
+      <div className="flex gap-8 p-4">
         <Column title="To Do" status="todo" tasks={tasks} />
         <Column title="In Progress" status="in-progress" tasks={tasks} />
         <Column title="Done" status="done" tasks={tasks} />
