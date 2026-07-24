@@ -1,8 +1,11 @@
 import { Card } from '../ui/Card';
 import { useData } from '../../lib/DataContext';
+import { ProjectDetailView } from './ProjectDetailView';
+import { useState } from 'react';
 
 export const Dashboard = () => {
   const { projects, tasks } = useData();
+  const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   
   const activeProjects = projects.filter((p) => p.status === 'active').length;
   const totalProgress = Math.round(
@@ -11,6 +14,10 @@ export const Dashboard = () => {
       : 0
   );
   const totalTasks = tasks.length;
+
+  if (activeProjectId) {
+    return <ProjectDetailView projectId={activeProjectId} onBack={() => setActiveProjectId(null)} />;
+  }
 
   return (
     <div className="p-10 space-y-10 min-h-screen bg-neutral-950 text-white">
@@ -38,7 +45,11 @@ export const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {projects.map((project) => (
-            <Card key={project.id} className="group hover:border-white/20 transition-all duration-300">
+            <Card 
+              key={project.id} 
+              className="group hover:border-white/20 transition-all duration-300 cursor-pointer"
+              onClick={() => setActiveProjectId(project.id)}
+            >
               <h2 className="text-lg font-semibold text-white/90">{project.name}</h2>
               <p className="text-white/50 text-sm mt-1 capitalize">{project.status}</p>
               <div className="w-full bg-white/5 h-2 rounded-full mt-6">
@@ -54,7 +65,6 @@ export const Dashboard = () => {
         <Card>
           <h2 className="text-xl font-semibold text-white/90 mb-6">Recent Activity</h2>
           <ul className="space-y-6">
-            {/* Activities could also be fetched from useData() */}
             <li className="text-sm text-white/40">No recent activity.</li>
           </ul>
         </Card>
