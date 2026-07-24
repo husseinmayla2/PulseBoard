@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { DndContext, closestCenter, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { useSortable, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useDroppable } from '@dnd-kit/core';
@@ -19,8 +19,8 @@ const Column = ({ title, status, tasks, onTaskClick }: { title: string; status: 
     >
       <h2 className="text-white/90 font-bold text-lg px-2 tracking-tight">{title}</h2>
       <div className="flex flex-col gap-3 min-h-[100px]">
-        <SortableContext items={tasks.filter(t => t.status === status).map(t => t.id)} strategy={verticalListSortingStrategy}>
-          {tasks.filter(t => t.status === status).map(task => (
+        <SortableContext items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+          {tasks.map(task => (
             <TaskCard key={task.id} task={task} onClick={() => onTaskClick(task)} />
           ))}
         </SortableContext>
@@ -57,7 +57,25 @@ export const KanbanBoard = () => {
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
+  const [filter, setFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
+  const [sort, setSort] = useState<'none' | 'deadline-asc' | 'deadline-desc'>('none');
+
   const sensors = useSensors(useSensor(PointerSensor));
+
+  const filteredSortedTasks = useMemo(() => {
+    let result = [...tasks];
+    if (filter !== 'all') {
+      result = result.filter(t => t.priority === filter);
+    }
+    if (sort !== 'none') {
+      result.sort((a, b) => {
+        const dateA = new Date(a.deadline).getTime();
+        const dateB = new Date(b.deadline).getTime();
+        return sort === 'deadline-asc' ? dateA - dateB : dateB - dateA;
+      });
+    }
+    return result;
+  }, [tasks, filter, sort]);
 
   const handleDragStart = (event: any) => {
     const { active } = event;
@@ -88,10 +106,24 @@ export const KanbanBoard = () => {
         onDragStart={handleDragStart} 
         onDragEnd={handleDragEnd}
     >
+      <div className="flex gap-4 mb-6 p-4 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-lg">
+        <select value={filter} onChange={(e) => setFilter(e.target.value as any)} className="bg-neutral-900 text-white p-2 rounded-lg border border-white/10">
+          <option value="all">All Priorities</option>
+          <option value="low">Low Priority</option>
+          <option value="medium">Medium Priority</option>
+          <option value="high">High Priority</option>
+        </select>
+        <select value={sort} onChange={(e) => setSort(e.target.value as any)} className="bg-neutral-900 text-white p-2 rounded-lg border border-white/10">
+          <option value="none">Sort by Deadline</option>
+          <option value="deadline-asc">Earliest Deadline</option>
+          <option value="deadline-desc">Latest Deadline</option>
+        </select>
+      </div>
+
       <div className="flex gap-8 p-4">
-        <Column title="To Do" status="todo" tasks={tasks} onTaskClick={setSelectedTask} />
-        <Column title="In Progress" status="in-progress" tasks={tasks} onTaskClick={setSelectedTask} />
-        <Column title="Done" status="done" tasks={tasks} onTaskClick={setSelectedTask} />
+        <Column title="To Do" status="todo" tasks={filteredSortedTasks.filter(t => t.status === 'todo')} onTaskClick={setSelectedTask} />
+        <Column title="In Progress" status="in-progress" tasks={filteredSortedTasks.filter(t => t.status === 'in-progress')} onTaskClick={setSelectedTask} />
+        <Column title="Done" status="done" tasks={filteredSortedTasks.filter(t => t.status === 'done')} onTaskClick={setSelectedTask} />
       </div>
       <DragOverlay>
         {activeTask ? <TaskCard task={activeTask} isOverlay /> : null}
