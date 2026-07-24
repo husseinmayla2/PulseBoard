@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { DndContext, closestCenter, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { useSortable, SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
+import { useSortable, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useDroppable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { tasks as initialTasks, Task } from '../../lib/mockData';
+import { Task } from '../../lib/mockData';
 import { TaskDetailPanel } from './TaskDetailPanel';
+import { useData } from '../../lib/DataContext';
 
 const Column = ({ title, status, tasks, onTaskClick }: { title: string; status: Task['status']; tasks: Task[], onTaskClick: (t: Task) => void }) => {
   const { setNodeRef, isOver } = useDroppable({
@@ -52,7 +53,7 @@ const TaskCard = ({ task, isOverlay, onClick }: { task: Task; isOverlay?: boolea
 };
 
 export const KanbanBoard = () => {
-  const [tasks, setTasks] = useState(initialTasks);
+  const { tasks, updateTask } = useData();
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
@@ -73,17 +74,9 @@ export const KanbanBoard = () => {
     const overId = over.id;
 
     if (['todo', 'in-progress', 'done'].includes(overId)) {
-        setTasks(tasks => tasks.map(task => {
-            if (task.id === activeId) {
-                return { ...task, status: overId as Task['status'] };
-            }
-            return task;
-        }));
-    } else {
-        const activeTaskIndex = tasks.findIndex(t => t.id === activeId);
-        const overTaskIndex = tasks.findIndex(t => t.id === overId);
-        if (activeTaskIndex !== overTaskIndex) {
-            setTasks((items) => arrayMove(items, activeTaskIndex, overTaskIndex));
+        const task = tasks.find(t => t.id === activeId);
+        if (task && task.status !== overId) {
+            updateTask({ ...task, status: overId as Task['status'] });
         }
     }
   };
@@ -108,7 +101,7 @@ export const KanbanBoard = () => {
           task={selectedTask} 
           onClose={() => setSelectedTask(null)} 
           onUpdate={(updatedTask) => {
-            setTasks(tasks.map(t => t.id === updatedTask.id ? updatedTask : t));
+            updateTask(updatedTask);
             setSelectedTask(updatedTask);
           }}
         />
